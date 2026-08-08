@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -20,7 +21,10 @@ const VEHICLE_TYPES = [
 
 const schema = z.object({
   fullName: z.string().trim().min(2, 'Name is required'),
-  phone: z.string().trim().min(6, 'A valid phone number is required'),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^(?:\+91|91)?[6-9]\d{9}$/, 'Enter a valid Indian mobile number'),
   email: z.string().trim().email('Enter a valid email address').optional().or(z.literal('')),
   city: z.string().trim().min(1, 'City is required'),
   vehicleType: z.string().optional(),
@@ -31,17 +35,33 @@ export function RiderApplySection() {
   const { data: platforms = [] } = usePublicContent('platforms');
   const submit = useSubmitRiderApplication();
   const reveal = useScrollReveal();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    setError,
+    clearErrors,
+    formState: { errors },
   } = useForm({ resolver: zodResolver(schema), defaultValues: { preferredPlatforms: [] } });
 
-  function onSubmit(values) {
+  async function onSubmit(values) {
+    clearErrors('root');
     const payload = { ...values, email: values.email || undefined };
-    submit.mutate(payload, { onSuccess: () => reset() });
+    try {
+      // `mutateAsync` is intentional: the confirmation must only appear
+      // after the API has persisted this lead, never merely after local form
+      // validation succeeds.
+      await submit.mutateAsync(payload);
+      reset();
+      setIsSubmitted(true);
+    } catch (error) {
+      setError('root.server', {
+        type: 'server',
+        message: error.message || 'We could not submit your application. Please try again.',
+      });
+    }
   }
 
   return (
@@ -56,7 +76,7 @@ export function RiderApplySection() {
               </p>
             </div>
 
-            {isSubmitSuccessful && !submit.isPending ? (
+            {isSubmitted ? (
               <div className="flex flex-col items-center gap-3 py-8 text-center">
                 <CheckCircle2 size={40} className="text-success-500" aria-hidden="true" />
                 <p className="text-body-lg font-medium text-neutral-900">Application received!</p>
@@ -155,6 +175,11 @@ export function RiderApplySection() {
                   <Send size={18} aria-hidden="true" />
                   {submit.isPending ? 'Submitting…' : 'Apply Now'}
                 </Button>
+                {errors.root?.server && (
+                  <p role="alert" className="text-center text-caption text-danger-700">
+                    {errors.root.server.message}
+                  </p>
+                )}
               </form>
             )}
           </Card>
