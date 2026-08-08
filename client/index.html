@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B0C12" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Cloudinary serves every content image on the site — connecting early
+         shaves the DNS+TLS handshake off the first image request. No
+         separate preconnect for the API origin: vercel.json proxies /api/*
+         to the Render backend at Vercel's edge, so the browser only ever
+         talks to this same origin (see docs/DEPLOYMENT-GUIDE.md). -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <title>Zerivon — India's Fastest Riders Onboarding Agency</title>
+    <meta
+      name="description"
+      content="Zerivon onboards riders onto Uber, Swiggy, Zomato, Blinkit, Zepto and Vahan in as little as 48 hours, with weekly payouts and free training."
+    />
+    <script src="/theme-init.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
