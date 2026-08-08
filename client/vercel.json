@@ -7,15 +7,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/api/:path*"
+      "destination": "https://delivery-job-web.onrender.com/api/:path*"
     },
     {
       "source": "/sitemap.xml",
-      "destination": "https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/sitemap.xml"
+      "destination": "https://delivery-job-web.onrender.com/sitemap.xml"
     },
     {
       "source": "/robots.txt",
-      "destination": "https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/robots.txt"
+      "destination": "https://delivery-job-web.onrender.com/robots.txt"
     },
     {
       "source": "/((?!api/|sitemap\\.xml|robots\\.txt).*)",
