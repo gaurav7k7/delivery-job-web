@@ -14,10 +14,8 @@ export default [
       globals: { ...globals.browser, ...globals.es2024 },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
-    // Pinned explicitly rather than `version: 'detect'` — eslint-plugin-react
-    // 7.37.5's auto-detection calls the deprecated context.getFilename()
-    // method internally, which ESLint 10 removed, crashing the linter
-    // entirely. Fixed here rather than downgrading ESLint.
+    // Pin the React version explicitly so linting is deterministic and does
+    // not depend on package auto-detection.
     settings: { react: { version: '19.2.8' } },
     plugins: {
       react,
