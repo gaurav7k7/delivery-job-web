@@ -25,7 +25,10 @@ export const listPublicByPage = async (req, res) => {
       { $or: [{ endDate: null }, { endDate: { $exists: false } }, { endDate: { $gte: now } }] },
     ],
   })
-    .sort('order')
+    // The homepage currently renders one banner. Admin-created banners default
+    // to order 0, so break ties by the latest edit; otherwise MongoDB's
+    // unspecified natural order could keep showing an older banner forever.
+    .sort({ order: 1, updatedAt: -1, _id: -1 })
     .lean();
   return new ApiResponse(200, banners).send(res);
 };

@@ -18,7 +18,13 @@ function ctaProps(url) {
 }
 
 export function HeroSection() {
-  const { data: banners, isLoading } = usePublicContent('hero-banners', '/page/home');
+  // Hero content is managed in the admin panel, so fetch fresh data each time
+  // the visitor returns to Home instead of retaining an older banner for five
+  // minutes in the React Query cache.
+  const { data: banners, isLoading } = usePublicContent('hero-banners', '/page/home', {
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
   const { data: settings } = useSiteSettings();
   const reveal = useScrollReveal();
 
