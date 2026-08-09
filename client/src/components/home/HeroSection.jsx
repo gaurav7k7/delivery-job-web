@@ -1,12 +1,12 @@
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { usePublicContent } from '../../api/publicContent.api';
-import { useSiteSettings } from '../../api/settings.api';
-import { Container } from '../ui/Container';
-import { Button } from '../ui/Button';
-import { OptimizedImage } from '../ui/OptimizedImage';
-import { Skeleton } from '../ui/Skeleton';
-import { useScrollReveal } from '../../hooks/useScrollReveal';
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { usePublicContent } from "../../api/publicContent.api";
+import { useSiteSettings } from "../../api/settings.api";
+import { Container } from "../ui/Container";
+import { Button } from "../ui/Button";
+import { OptimizedImage } from "../ui/OptimizedImage";
+import { Skeleton } from "../ui/Skeleton";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 
 // `Button`'s `to` prop renders a React Router <Link>, which does not trigger
 // the browser's native scroll-to-element for hash-only targets on a
@@ -14,21 +14,27 @@ import { useScrollReveal } from '../../hooks/useScrollReveal';
 // is admin-entered and may be either a real route or an in-page anchor
 // (e.g. "#apply"), so the prop has to be picked based on which it is.
 function ctaProps(url) {
-  return url.startsWith('#') ? { href: url } : { to: url };
+  return url.startsWith("#") ? { href: url } : { to: url };
 }
 
 export function HeroSection() {
   // Hero content is managed in the admin panel, so fetch fresh data each time
   // the visitor returns to Home instead of retaining an older banner for five
   // minutes in the React Query cache.
-  const { data: banners, isLoading } = usePublicContent('hero-banners', '/page/home', {
-    staleTime: 0,
-    refetchOnMount: 'always',
-  });
+  const { data: banners, isLoading } = usePublicContent(
+    "hero-banners",
+    "/page/home",
+    {
+      staleTime: 0,
+      refetchOnMount: "always",
+    },
+  );
   const { data: settings } = useSiteSettings();
   const reveal = useScrollReveal();
 
   const banner = banners?.[0];
+  const whatsapp = settings?.contact?.whatsapp;
+  const phone = settings?.contact?.phones?.[0];
 
   if (isLoading) {
     return (
@@ -44,11 +50,37 @@ export function HeroSection() {
     );
   }
 
-  const title = banner?.title ?? `${settings?.siteName ?? 'Zerivon'} — Onboard Riders in Record Time`;
+  const title =
+    banner?.title ??
+    `${settings?.siteName ?? "Zerivon"} — Onboard Riders in Record Time`;
   const description =
     banner?.description ??
     settings?.tagline ??
-    'We onboard riders onto Uber, Swiggy, Zomato, Blinkit, Zepto and Vahan in as little as 48 hours, with weekly payouts and free training.';
+    "We onboard riders onto Uber, Swiggy, Zomato, Blinkit, Zepto and Vahan in as little as 48 hours, with weekly payouts and free training.";
+
+  const primary = banner?.ctaPrimary?.url
+    ? {
+        label: banner?.ctaPrimary?.label || "Become a Rider",
+        props: ctaProps(banner?.ctaPrimary?.url),
+      }
+    : whatsapp
+      ? {
+          label: "WhatsApp",
+          props: { href: `https://wa.me/${whatsapp.replace(/\D/g, "")}` },
+        }
+      : { label: "Become a Rider", props: { to: "#apply" } };
+
+  const secondary = banner?.ctaSecondary?.url
+    ? {
+        label: banner?.ctaSecondary?.label || "Talk to Us",
+        props: ctaProps(banner?.ctaSecondary?.url),
+      }
+    : phone
+      ? {
+          label: "Call Us Now",
+          props: { href: `tel:${phone.replace(/\s+/g, "")}` },
+        }
+      : { label: "Talk to Us", props: { to: "#contact" } };
 
   return (
     <section className="relative overflow-hidden">
@@ -60,15 +92,19 @@ export function HeroSection() {
               {banner.subtitle}
             </span>
           )}
-          <h1 className="font-heading text-display text-neutral-900">{title}</h1>
-          <p className="max-w-xl text-body-lg text-neutral-600">{description}</p>
+          <h1 className="font-heading text-display text-neutral-900">
+            {title}
+          </h1>
+          <p className="max-w-xl text-body-lg text-neutral-600">
+            {description}
+          </p>
           <div className="flex flex-wrap gap-4">
-            <Button {...ctaProps(banner?.ctaPrimary?.url || '#apply')} size="lg">
-              {banner?.ctaPrimary?.label || 'Become a Rider'}
+            <Button {...primary.props} size="lg">
+              {primary.label}
               <ArrowRight size={18} aria-hidden="true" />
             </Button>
-            <Button {...ctaProps(banner?.ctaSecondary?.url || '#contact')} variant="secondary" size="lg">
-              {banner?.ctaSecondary?.label || 'Talk to Us'}
+            <Button {...secondary.props} variant="secondary" size="lg">
+              {secondary.label}
             </Button>
           </div>
         </motion.div>
@@ -78,12 +114,19 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden rounded-xl shadow-[var(--shadow-elevation-3)]"
+            className="overflow-hidden rounded-xl shadow-(--shadow-elevation-3)"
           >
-            <OptimizedImage src={banner.image.url} alt={banner.image.alt || title} width={720} height={540} priority className="h-full w-full" />
+            <OptimizedImage
+              src={banner.image.url}
+              alt={banner.image.alt || title}
+              width={720}
+              height={540}
+              priority
+              className="h-full w-full"
+            />
           </motion.div>
         ) : (
-          <div className="hidden aspect-4/3 rounded-xl bg-gradient-to-br from-primary-500/15 to-accent-500/15 lg:block" />
+          <div className="hidden aspect-4/3 rounded-xl bg-linear-to-br from-primary-500/15 to-accent-500/15 lg:block" />
         )}
       </Container>
     </section>

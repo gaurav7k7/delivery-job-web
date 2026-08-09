@@ -1,12 +1,12 @@
-import { z } from 'zod';
-import { imageSchema, seoSchema } from './shared.validator.js';
+import { z } from "zod";
+import { imageSchema, seoSchema } from "./shared.validator.js";
 
 export const updateSiteSettingSchema = z.object({
   body: z.object({
     siteName: z.string().trim().min(2).max(120).optional(),
     tagline: z.string().trim().max(200).optional(),
-    logo: imageSchema.optional(),
-    favicon: imageSchema.optional(),
+    logo: imageSchema.nullable().optional(),
+    favicon: imageSchema.nullable().optional(),
     themeColors: z
       .object({
         primary: z.string().trim().optional(),
@@ -20,7 +20,7 @@ export const updateSiteSettingSchema = z.object({
       .object({
         phones: z.array(z.string().trim()).optional(),
         whatsapp: z.string().trim().optional(),
-        email: z.string().trim().email().optional().or(z.literal('')),
+        email: z.string().trim().email().optional().or(z.literal("")),
         addressLine: z.string().trim().optional(),
       })
       .optional(),
