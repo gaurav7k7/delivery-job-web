@@ -18,7 +18,7 @@
       "destination": "https://delivery-job-web.onrender.com/robots.txt"
     },
     {
-      "source": "/((?!api/|sitemap\\.xml|robots\\.txt).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
